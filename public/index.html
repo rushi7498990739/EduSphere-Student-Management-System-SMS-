@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduSphere - Student Management System</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Auth Pages -->
+  <div id="auth-container" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <span class="material-icons logo-icon">school</span>
+        <h1>EduSphere</h1>
+        <p>Student Management System</p>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form active">
+        <h2>Sign In</h2>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Enter your password" required />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="login()">Sign In</button>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="showRegister()">Sign Up</a></p>
+        <div class="demo-accounts">
+          <p><strong>Demo Accounts:</strong></p>
+          <button class="demo-btn" onclick="fillDemo('admin@sms.com','admin123')">Admin</button>
+          <button class="demo-btn" onclick="fillDemo('teacher@sms.com','teacher123')">Teacher</button>
+          <button class="demo-btn" onclick="fillDemo('student@sms.com','student123')">Student</button>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="auth-form">
+        <h2>Create Account</h2>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Enter your full name" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Create a password" required />
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="reg-role">
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Phone (Optional)</label>
+          <input type="tel" id="reg-phone" placeholder="Enter phone number" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="register()">Create Account</button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Sign In</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app-container" class="app-container hidden">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <span class="material-icons">menu</span>
+        </button>
+        <div class="brand">
+          <span class="material-icons">school</span>
+          <span class="brand-text">EduSphere</span>
+        </div>
+      </div>
+
+      <div class="user-profile-mini" onclick="showPage('profile')">
+        <div class="avatar" id="sidebar-avatar">A</div>
+        <div class="user-info">
+          <span id="sidebar-name">User</span>
+          <span id="sidebar-role" class="role-badge">student</span>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+          <span class="material-icons">dashboard</span>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item" data-page="classes" onclick="showPage('classes')">
+          <span class="material-icons">class</span>
+          <span>My Classes</span>
+        </li>
+        <li class="nav-item" data-page="assignments" onclick="showPage('assignments')">
+          <span class="material-icons">assignment</span>
+          <span>Assignments</span>
+        </li>
+        <li class="nav-item" data-page="grades" onclick="showPage('grades')">
+          <span class="material-icons">grade</span>
+          <span>Grades</span>
+        </li>
+        <li class="nav-item" data-page="attendance" onclick="showPage('attendance')">
+          <span class="material-icons">fact_check</span>
+          <span>Attendance</span>
+        </li>
+        <li class="nav-item" data-page="calendar" onclick="showPage('calendar')">
+          <span class="material-icons">calendar_month</span>
+          <span>Calendar</span>
+        </li>
+        <li class="nav-item" data-page="messages" onclick="showPage('messages')">
+          <span class="material-icons">chat</span>
+          <span>Messages</span>
+          <span id="msg-badge" class="badge hidden">0</span>
+        </li>
+        <li class="nav-item admin-only hidden" data-page="admin" onclick="showPage('admin')">
+          <span class="material-icons">admin_panel_settings</span>
+          <span>Admin Panel</span>
+        </li>
+        <li class="nav-item" data-page="profile" onclick="showPage('profile')">
+          <span class="material-icons">person</span>
+          <span>Profile</span>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()">
+          <span class="material-icons">logout</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle-mobile" onclick="toggleSidebar()">
+          <span class="material-icons">menu</span>
+        </button>
+        <div id="page-title" class="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search..." id="global-search" />
+        </div>
+        <div class="notif-btn" onclick="toggleNotifications()">
+          <span class="material-icons">notifications</span>
+          <span id="notif-badge" class="badge hidden">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Dropdown -->
+    <div id="notif-dropdown" class="notif-dropdown hidden">
+      <div class="notif-header">
+        <h3>Notifications</h3>
+        <button onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div id="notif-list" class="notif-list"></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Dashboard Page -->
+      <div id="page-dashboard" class="page active">
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="dashboard-grid">
+          <div class="dashboard-col">
+            <div class="card">
+              <div class="card-header">
+                <h3><span class="material-icons">class</span> My Classes</h3>
+                <a href="#" onclick="showPage('classes')">View All</a>
+              </div>
+              <div id="dash-classes" class="dash-list"></div>
+            </div>
+          </div>
+          <div class="dashboard-col">
+            <div class="card">
+              <div class="card-header">
+                <h3><span class="material-icons">assignment_late</span> Upcoming Work</h3>
+              </div>
+              <div id="dash-assignments" class="dash-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classes Page -->
+      <div id="page-classes" class="page">
+        <div class="page-header">
+          <h2>My Classes</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary teacher-only hidden" onclick="showModal('create-class-modal')">
+              <span class="material-icons">add</span> Create Class
+            </button>
+            <button class="btn btn-outline student-only hidden" onclick="showModal('join-class-modal')">
+              <span class="material-icons">login</span> Join Class
+            </button>
+          </div>
+        </div>
+        <div id="classes-grid" class="classes-grid"></div>
+      </div>
+
+      <!-- Class Detail Page -->
+      <div id="page-class-detail" class="page">
+        <div class="class-detail-header" id="class-detail-header">
+          <button class="btn-back" onclick="showPage('classes')">
+            <span class="material-icons">arrow_back</span>
+          </button>
+          <div class="class-detail-info">
+            <h2 id="class-detail-name"></h2>
+            <p id="class-detail-subject"></p>
+          </div>
+          <div class="class-detail-actions">
+            <button class="btn btn-outline teacher-only hidden" onclick="showCreateAssignment()">
+              <span class="material-icons">add</span> Add Work
+            </button>
+          </div>
+        </div>
+        <div class="class-tabs">
+          <button class="tab-btn active" onclick="switchTab('stream')" data-tab="stream">Stream</button>
+          <button class="tab-btn" onclick="switchTab('classwork')" data-tab="classwork">Classwork</button>
+          <button class="tab-btn" onclick="switchTab('people')" data-tab="people">People</button>
+          <button class="tab-btn" onclick="switchTab('grades-tab')" data-tab="grades-tab">Grades</button>
+          <button class="tab-btn teacher-only hidden" onclick="switchTab('attendance-tab')" data-tab="attendance-tab">Attendance</button>
+        </div>
+        <div id="tab-stream" class="tab-content active">
+          <div class="stream-composer teacher-only hidden">
+            <div class="composer-box" onclick="expandComposer(this)">
+              <div class="composer-avatar" id="composer-avatar">A</div>
+              <input type="text" placeholder="Share something with your class..." id="announce-input" />
+            </div>
+            <div class="composer-actions hidden">
+              <button class="btn btn-primary" onclick="postAnnouncement()">Post</button>
+            </div>
+          </div>
+          <div id="stream-list" class="stream-list"></div>
+        </div>
+        <div id="tab-classwork" class="tab-content">
+          <div id="classwork-list" class="classwork-list"></div>
+        </div>
+        <div id="tab-people" class="tab-content">
+          <div id="people-list" class="people-list"></div>
+        </div>
+        <div id="tab-grades-tab" class="tab-content">
+          <div id="class-grades-list"></div>
+        </div>
+        <div id="tab-attendance-tab" class="tab-content">
+          <div class="attendance-controls">
+            <input type="date" id="attendance-date" value="" />
+            <button class="btn btn-primary" onclick="loadAttendance()">Load</button>
+            <button class="btn btn-success" onclick="saveAttendance()">Save Attendance</button>
+          </div>
+          <div id="attendance-list" class="attendance-list"></div>
+        </div>
+      </div>
+
+      <!-- Assignment Detail Page -->
+      <div id="page-assignment-detail" class="page">
+        <div class="assignment-detail-header">
+          <button class="btn-back" onclick="goBackFromAssignment()">
+            <span class="material-icons">arrow_back</span>
+          </button>
+          <h2 id="assignment-detail-title"></h2>
+        </div>
+        <div class="assignment-detail-body">
+          <div class="assignment-info-panel">
+            <div class="card assignment-card">
+              <div class="assignment-meta">
+                <span id="assignment-detail-points" class="points-badge"></span>
+                <span id="assignment-detail-due" class="due-badge"></span>
+              </div>
+              <p id="assignment-detail-desc" class="assignment-desc"></p>
+              <div id="assignment-attachment-link"></div>
+            </div>
+            <div class="card submission-card student-only hidden">
+              <h3>Your Work</h3>
+              <div id="my-submission-status"></div>
+              <textarea id="submission-content" placeholder="Add your work here..." rows="5"></textarea>
+              <div class="form-group">
+                <label>Attach File</label>
+                <input type="file" id="submission-file" />
+              </div>
+              <div class="submission-actions">
+                <button class="btn btn-primary" onclick="submitAssignment()">
+                  <span class="material-icons">send</span> Turn In
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="submissions-panel teacher-only hidden">
+            <div class="card">
+              <h3>Student Submissions</h3>
+              <div id="submissions-list" class="submissions-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignments Page -->
+      <div id="page-assignments" class="page">
+        <div class="page-header"><h2>All Assignments</h2></div>
+        <div id="all-assignments-list" class="all-assignments-list"></div>
+      </div>
+
+      <!-- Grades Page -->
+      <div id="page-grades" class="page">
+        <div class="page-header"><h2>Grades</h2></div>
+        <div id="grades-content"></div>
+      </div>
+
+      <!-- Attendance Page -->
+      <div id="page-attendance" class="page">
+        <div class="page-header"><h2>Attendance Overview</h2></div>
+        <div id="attendance-overview"></div>
+      </div>
+
+      <!-- Calendar Page -->
+      <div id="page-calendar" class="page">
+        <div class="page-header">
+          <h2>Calendar</h2>
+          <button class="btn btn-primary teacher-only hidden" onclick="showModal('create-event-modal')">
+            <span class="material-icons">add</span> Add Event
+          </button>
+        </div>
+        <div class="calendar-container">
+          <div class="calendar-nav">
+            <button onclick="prevMonth()"><span class="material-icons">chevron_left</span></button>
+            <h3 id="calendar-month-year"></h3>
+            <button onclick="nextMonth()"><span class="material-icons">chevron_right</span></button>
+          </div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+          <div class="events-sidebar">
+            <h3>Upcoming Events</h3>
+            <div id="events-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Page -->
+      <div id="page-messages" class="page">
+        <div class="messages-layout">
+          <div class="conversations-panel">
+            <div class="conv-header">
+              <h3>Messages</h3>
+              <button onclick="showNewMessage()"><span class="material-icons">edit</span></button>
+            </div>
+            <div id="conversations-list" class="conversations-list"></div>
+          </div>
+          <div class="chat-panel" id="chat-panel">
+            <div class="chat-empty">
+              <span class="material-icons">chat_bubble_outline</span>
+              <p>Select a conversation to start messaging</p>
+            </div>
+            <div id="chat-window" class="chat-window hidden">
+              <div class="chat-header" id="chat-header"></div>
+              <div class="chat-messages" id="chat-messages"></div>
+              <div class="chat-input-box">
+                <textarea id="chat-input" placeholder="Type a message..." rows="2" onkeydown="handleChatKey(event)"></textarea>
+                <button onclick="sendMessage()" class="btn btn-primary">
+                  <span class="material-icons">send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Page -->
+      <div id="page-admin" class="page">
+        <div class="page-header"><h2>Admin Panel</h2></div>
+        <div id="admin-stats" class="admin-stats-grid"></div>
+        <div class="admin-tabs">
+          <button class="tab-btn active" onclick="switchAdminTab('users')" data-tab="users">Users</button>
+          <button class="tab-btn" onclick="switchAdminTab('classes-admin')" data-tab="classes-admin">Classes</button>
+        </div>
+        <div id="admin-tab-users" class="admin-tab-content active">
+          <div class="card">
+            <div class="card-header">
+              <h3>All Users</h3>
+              <input type="text" placeholder="Search users..." id="user-search" onkeyup="filterUsers()" />
+            </div>
+            <table class="data-table" id="users-table">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Last Login</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="admin-tab-classes-admin" class="admin-tab-content">
+          <div id="admin-classes-list" class="classes-grid"></div>
+        </div>
+      </div>
+
+      <!-- Profile Page -->
+      <div id="page-profile" class="page">
+        <div class="page-header"><h2>My Profile</h2></div>
+        <div class="profile-container">
+          <div class="card profile-card">
+            <div class="profile-avatar-large" id="profile-avatar-large">A</div>
+            <h2 id="profile-name-display"></h2>
+            <span id="profile-role-badge" class="role-badge"></span>
+            <div class="profile-stats" id="profile-stats"></div>
+          </div>
+          <div class="card profile-form-card">
+            <h3>Edit Profile</h3>
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="profile-name" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profile-email" disabled />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="profile-phone" />
+            </div>
+            <h3>Change Password</h3>
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="current-password" />
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="new-password" />
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+  <!-- Create Class Modal -->
+  <div id="create-class-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('create-class-modal')"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create Class</h3>
+        <button onclick="hideModal('create-class-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-group">
+        <label>Class Name *</label>
+        <input type="text" id="cls-name" placeholder="e.g. Mathematics" />
+      </div>
+      <div class="form-group">
+        <label>Section</label>
+        <input type="text" id="cls-section" placeholder="e.g. Section A" />
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="cls-subject" placeholder="e.g. Algebra" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="cls-desc" rows="3" placeholder="Class description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Cover Color</label>
+        <input type="color" id="cls-color" value="#1a73e8" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('create-class-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createClass()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Class Modal -->
+  <div id="join-class-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('join-class-modal')"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Join Class</h3>
+        <button onclick="hideModal('join-class-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <p>Ask your teacher for the class code, then enter it here.</p>
+      <div class="form-group">
+        <label>Class Code</label>
+        <input type="text" id="join-code" placeholder="e.g. ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.5rem;text-align:center;" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('join-class-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="joinClass()">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Assignment Modal -->
+  <div id="create-assignment-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('create-assignment-modal')"></div>
+    <div class="modal-box modal-large">
+      <div class="modal-header">
+        <h3>Create Assignment</h3>
+        <button onclick="hideModal('create-assignment-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="assign-type">
+          <option value="assignment">Assignment</option>
+          <option value="quiz">Quiz</option>
+          <option value="material">Material</option>
+          <option value="question">Question</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" id="assign-title" placeholder="Assignment title" />
+      </div>
+      <div class="form-group">
+        <label>Instructions</label>
+        <textarea id="assign-desc" rows="4" placeholder="Add instructions..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="datetime-local" id="assign-due" />
+        </div>
+        <div class="form-group">
+          <label>Points</label>
+          <input type="number" id="assign-points" value="100" min="0" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Attach File</label>
+        <input type="file" id="assign-file" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('create-assignment-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createAssignment()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Event Modal -->
+  <div id="create-event-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('create-event-modal')"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create Event</h3>
+        <button onclick="hideModal('create-event-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" id="event-title" />
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="event-type">
+          <option value="event">Event</option>
+          <option value="exam">Exam</option>
+          <option value="holiday">Holiday</option>
+          <option value="deadline">Deadline</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Start Date *</label>
+        <input type="datetime-local" id="event-start" />
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="datetime-local" id="event-end" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="event-desc" rows="3"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('create-event-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createEvent()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade Modal -->
+  <div id="grade-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('grade-modal')"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Grade Submission</h3>
+        <button onclick="hideModal('grade-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <div id="grade-submission-info"></div>
+      <div class="form-group">
+        <label>Points Earned</label>
+        <input type="number" id="grade-points" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Feedback</label>
+        <textarea id="grade-feedback" rows="3" placeholder="Leave feedback for student..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('grade-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitGrade()">Save Grade</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Message Modal -->
+  <div id="new-message-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="hideModal('new-message-modal')"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>New Message</h3>
+        <button onclick="hideModal('new-message-modal')"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-group">
+        <label>To</label>
+        <select id="message-to"></select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="new-message-content" rows="4"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="hideModal('new-message-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="sendNewMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

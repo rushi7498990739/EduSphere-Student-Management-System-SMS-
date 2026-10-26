@@ -1,0 +1,14 @@
+{
+  "name": "edusphere-sms",
+  "version": "1.0.0",
+  "description": "EduSphere - Student Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node seed.js"
+  },
+  "keywords": ["education", "student", "management"],
+  "author": "",
+  "license": "ISC"
+}
